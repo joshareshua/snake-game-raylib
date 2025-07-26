@@ -17,6 +17,21 @@ int cellSize = 30;
 int cellCount = 25;
 
 //class for the actual snake, initializing it as 3 cells long
+class Snake{
+public:
+    deque<Vector2> body = {Vector2{6,9},Vector2{5,9},Vector2{4,9}};
+    void Draw(){
+        for(unsigned int i = 0;i<body.size();i++){
+            float x = body[i].x;
+            float y = body[i].y;
+            Rectangle segment = Rectangle{x*cellSize, y*cellSize, (float)cellSize, (float)cellSize};
+            DrawRectangleRounded(segment, 0.5, 6, blueGlow);
+        }
+
+    }
+
+
+};
 
 
 //class for food objects
@@ -60,6 +75,8 @@ int main() {
     Food food = Food();
     Food food1 = Food();
     Food food2 = Food();
+
+    Snake snake = Snake();
     
 
     // Main game loop, if user presses escape or x then ends game loop.
@@ -71,6 +88,7 @@ int main() {
         food.Draw();
         food1.Draw();
         food2.Draw();
+        snake.Draw();
 
         EndDrawing();
     }
