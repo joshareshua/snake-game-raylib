@@ -6,6 +6,7 @@
 #include <ctime>
 #include <deque>
 #include "raylib.h"
+#include <raymath.h>
 
 using namespace std;
 
@@ -16,10 +17,26 @@ Color blueGlow = {0, 200, 255, 255};
 int cellSize = 30;
 int cellCount = 25;
 
+double lastUpdateTime = 0;
+
+bool eventTriggered(double interval){
+    double currentTime = GetTime();
+    if(currentTime-lastUpdateTime>=interval){
+        lastUpdateTime=currentTime;
+        return true;
+    }
+    return false;
+}
+
+
 //class for the actual snake, initializing it as 3 cells long
 class Snake{
 public:
     deque<Vector2> body = {Vector2{6,9},Vector2{5,9},Vector2{4,9}};
+    Vector2 direction = {1,0};
+
+
+
     void Draw(){
         for(unsigned int i = 0;i<body.size();i++){
             float x = body[i].x;
@@ -28,6 +45,12 @@ public:
             DrawRectangleRounded(segment, 0.5, 6, blueGlow);
         }
 
+    }
+    
+    //handle the snake movements by just removing last cell and appending new cell in direction it's moving
+    void Update(){
+        body.pop_back();
+        body.push_front(Vector2Add(body[0], direction));
     }
 
 
@@ -82,6 +105,9 @@ int main() {
     // Main game loop, if user presses escape or x then ends game loop.
     while(WindowShouldClose()==false){
         BeginDrawing();
+        if(eventTriggered(0.2)){
+            snake.Update();
+        }
 
         //drawing the background
         ClearBackground(purple);
