@@ -4,10 +4,13 @@
 #include <algorithm>
 #include <cstdlib>  
 #include <ctime>
+#include "raylib.h"
 
 using namespace std;
 
-#include "raylib.h"
+
+Color purple = {45, 0, 54, 255};
+
 
 int main() {
     //initalizing the window 750x750 pixels
@@ -19,6 +22,9 @@ int main() {
     // Main game loop, if user presses escape or x then ends game loop.
     while(WindowShouldClose()==false){
         BeginDrawing();
+
+        //drawing the background
+        ClearBackground(purple);
 
         EndDrawing();
     }
