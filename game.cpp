@@ -10,16 +10,19 @@ using namespace std;
 #include "raylib.h"
 
 int main() {
-    InitWindow(800, 600, "Hello Raylib");
-    SetTargetFPS(60);
+    //initalizing the window 750x750 pixels
+    cout<<"Starting the game..." << endl;
+    InitWindow(750,750,"Snake Game");
+    SetTargetFPS(60); //frames per second for how fast the game runs
 
-    while (!WindowShouldClose()) {
+
+    // Main game loop, if user presses escape or x then ends game loop.
+    while(WindowShouldClose()==false){
         BeginDrawing();
-        ClearBackground(RAYWHITE);
-        DrawText("Welcome to Raylib on macOS!", 190, 200, 20, LIGHTGRAY);
+
         EndDrawing();
     }
-
     CloseWindow();
     return 0;
+    
 }
