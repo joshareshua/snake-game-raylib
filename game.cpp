@@ -142,11 +142,14 @@ public:
     int hiscore = score;
     Sound eatSound;
     Sound wallSound;
+    Music backgroundMusic;
 
     Game(){
         InitAudioDevice();
         eatSound = LoadSound("Sound/eat.mp3");
         wallSound = LoadSound("Sound/wall.wav");
+        backgroundMusic = LoadMusicStream("Sound/background.mp3");
+        PlayMusicStream(backgroundMusic);
         
         LoadHighScore();
     }
@@ -154,6 +157,7 @@ public:
     ~Game(){
         UnloadSound(eatSound);
         UnloadSound(wallSound);
+        UnloadMusicStream(backgroundMusic);
         CloseAudioDevice();
     }
 
@@ -247,6 +251,7 @@ int main() {
     // Main game loop, if user presses escape or x then ends game loop.
     while(WindowShouldClose()==false){
         BeginDrawing();
+        UpdateMusicStream(game.backgroundMusic);
         if(eventTriggered(0.13)){
             game.Update();
         }
