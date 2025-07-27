@@ -7,6 +7,7 @@
 #include <deque>
 #include "raylib.h"
 #include <raymath.h>
+#include <fstream>
 
 using namespace std;
 
@@ -139,6 +140,22 @@ public:
     bool running = true;
     int score = 0;
     int hiscore = score;
+    Sound eatSound;
+    Sound wallSound;
+
+    Game(){
+        InitAudioDevice();
+        eatSound = LoadSound("Sound/eat.mp3");
+        wallSound = LoadSound("Sound/wall.wav");
+        
+        LoadHighScore();
+    }
+
+    ~Game(){
+        UnloadSound(eatSound);
+        UnloadSound(wallSound);
+        CloseAudioDevice();
+    }
 
     void Draw(){
         food.Draw();
@@ -154,12 +171,32 @@ public:
         }
     }
 
+    void LoadHighScore(){
+        ifstream file("hiscore.txt");
+        if(file.is_open()){
+            file >> hiscore;
+            file.close();
+        }
+        else{
+            hiscore = 0;
+        }
+    }
+
+    void SaveHighScore(){
+        ofstream file("hiscore.txt");
+        if(file.is_open()){
+            file<<hiscore;
+            file.close();
+        }
+    }
+
     void CheckCollisionWithFood(){
         if(Vector2Equals(snake.body[0],food.position))
         {
             food.position = food.GenerateRandomPos(snake.body);
             snake.addSegment = true;
             score++;
+            PlaySound(eatSound);
         }
     }
 
@@ -179,8 +216,10 @@ public:
         running = false;
         if(score>hiscore){
             hiscore = score;
+            SaveHighScore();
         }
         score = 0;
+        PlaySound(wallSound);
         
     }
 
@@ -208,7 +247,7 @@ int main() {
     // Main game loop, if user presses escape or x then ends game loop.
     while(WindowShouldClose()==false){
         BeginDrawing();
-        if(eventTriggered(0.3)){
+        if(eventTriggered(0.13)){
             game.Update();
         }
 
