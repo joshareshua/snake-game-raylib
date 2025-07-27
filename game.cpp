@@ -138,6 +138,7 @@ public:
     Food food = Food(snake.body);
     bool running = true;
     int score = 0;
+    int hiscore = score;
 
     void Draw(){
         food.Draw();
@@ -176,7 +177,11 @@ public:
         snake.Reset();
         food.position = food.GenerateRandomPos(snake.body);
         running = false;
+        if(score>hiscore){
+            hiscore = score;
+        }
         score = 0;
+        
     }
 
     void CheckCollisionWithTail(){
@@ -235,6 +240,7 @@ int main() {
 
         DrawText("Juicy Snake",offset-5,20,40, blueGlow);
         DrawText(TextFormat("%i",game.score),offset-5, offset+cellSize*cellCount+10,40, blueGlow);
+        DrawText(TextFormat("Hiscore: %i",game.hiscore),cellSize*cellCount-2*offset, 20 ,40, blueGlow);
         game.Draw();
 
         EndDrawing();
