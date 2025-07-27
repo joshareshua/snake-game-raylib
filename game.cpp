@@ -13,9 +13,14 @@ using namespace std;
 
 Color purple = {45, 0, 54, 255};
 Color blueGlow = {0, 200, 255, 255};
+Color dark = {61, 28, 30, 255};
 
-int cellSize = 30;
+
+//Updated the cellsize from 750x750 to 500x500 to fit on the screen
+int cellSize = 25;
 int cellCount = 25;
+int offset = 75;
+
 
 double lastUpdateTime = 0;
 
@@ -54,7 +59,7 @@ public:
         for(unsigned int i = 0;i<body.size();i++){
             float x = body[i].x;
             float y = body[i].y;
-            Rectangle segment = Rectangle{x*cellSize, y*cellSize, (float)cellSize, (float)cellSize};
+            Rectangle segment = Rectangle{offset+ x*cellSize, offset+ y*cellSize, (float)cellSize, (float)cellSize};
             DrawRectangleRounded(segment, 0.5, 6, blueGlow);
         }
 
@@ -102,7 +107,7 @@ public:
     }
 
     void Draw(){
-        DrawTexture(texture, position.x*cellSize, position.y*cellSize, WHITE);
+        DrawTexture(texture, offset + position.x*cellSize, offset + position.y*cellSize, WHITE);
     }
 
     Vector2 GenerateRandomCell(){
@@ -132,6 +137,7 @@ public:
     Snake snake = Snake();
     Food food = Food(snake.body);
     bool running = true;
+    int score = 0;
 
     void Draw(){
         food.Draw();
@@ -152,6 +158,7 @@ public:
         {
             food.position = food.GenerateRandomPos(snake.body);
             snake.addSegment = true;
+            score++;
         }
     }
 
@@ -169,6 +176,7 @@ public:
         snake.Reset();
         food.position = food.GenerateRandomPos(snake.body);
         running = false;
+        score = 0;
     }
 
     void CheckCollisionWithTail(){
@@ -186,7 +194,7 @@ public:
 int main() {
     //initalizing the window 750x750 pixels
     cout<<"Starting the game..." << endl;
-    InitWindow(cellSize*cellCount, cellSize*cellCount,"Snake Game");
+    InitWindow(2*offset + cellSize*cellCount, 2*offset + cellSize*cellCount,"Snake Game");
     SetTargetFPS(60); //frames per second for how fast the game runs
 
     Game game = Game();
@@ -195,7 +203,7 @@ int main() {
     // Main game loop, if user presses escape or x then ends game loop.
     while(WindowShouldClose()==false){
         BeginDrawing();
-        if(eventTriggered(0.2)){
+        if(eventTriggered(0.3)){
             game.Update();
         }
 
@@ -222,6 +230,11 @@ int main() {
 
         //drawing the background
         ClearBackground(purple);
+        DrawRectangleLinesEx(Rectangle{(float)offset-5, (float)offset-5,(float)cellSize*cellCount+10, 
+            (float)cellSize*cellCount+10},5,blueGlow);
+
+        DrawText("Juicy Snake",offset-5,20,40, blueGlow);
+        DrawText(TextFormat("%i",game.score),offset-5, offset+cellSize*cellCount+10,40, blueGlow);
         game.Draw();
 
         EndDrawing();
