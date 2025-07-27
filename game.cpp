@@ -19,6 +19,18 @@ int cellCount = 25;
 
 double lastUpdateTime = 0;
 
+//To handle if the food generates again right in front of the snake body randomly in inside the body
+bool ElementInDeque(Vector2 element, deque<Vector2> deque){
+    for(unsigned int i = 0; i<deque.size();i++){
+        if (Vector2Equals(deque[i],element)){
+            return true;
+        }
+    }
+    return false; 
+
+}
+
+//For frames per second adjustment
 bool eventTriggered(double interval){
     double currentTime = GetTime();
     if(currentTime-lastUpdateTime>=interval){
@@ -64,11 +76,11 @@ public:
     Texture2D texture;
 
     //Loading actual image as the food object
-    Food(){
+    Food(deque<Vector2> snakeBody){
         Image image = LoadImage("Graphics/food.png");
         texture  = LoadTextureFromImage(image);
         UnloadImage(image);
-        position = GenerateRandomPos();
+        position = GenerateRandomPos(snakeBody);
     }
     //destructor for freeing memory after use
     ~Food(){
@@ -78,15 +90,55 @@ public:
     void Draw(){
         DrawTexture(texture, position.x*cellSize, position.y*cellSize, WHITE);
     }
-    //generate a random position for each food using these Raylib functions
-    Vector2 GenerateRandomPos(){
+
+    Vector2 GenerateRandomCell(){
         float x = GetRandomValue(0,cellCount-1);
         float y = GetRandomValue(0,cellCount-1);
+        Vector2 position = {x,y};
+
         return Vector2{x,y};
+    }
+
+    //generate a random position for each food using these Raylib functions
+    Vector2 GenerateRandomPos(deque<Vector2> snakeBody){
+        
+        Vector2 position = GenerateRandomCell();
+
+        while(ElementInDeque(position,snakeBody)){
+            position = GenerateRandomCell();
+        }
+        return position;
     }
 
 };
 
+
+class Game{
+public:
+    Snake snake = Snake();
+    Food food = Food(snake.body);
+
+    void Draw(){
+        food.Draw();
+        snake.Draw();
+    }
+
+    void Update(){
+        snake.Update();
+        CheckCollisionWithFood();
+    }
+
+    void CheckCollisionWithFood(){
+        if(Vector2Equals(snake.body[0],food.position))
+        {
+            food.position = food.GenerateRandomPos(snake.body);
+        }
+    }
+
+
+
+
+};
 
 int main() {
     //initalizing the window 750x750 pixels
@@ -94,44 +146,36 @@ int main() {
     InitWindow(cellSize*cellCount, cellSize*cellCount,"Snake Game");
     SetTargetFPS(60); //frames per second for how fast the game runs
 
-    //create food object to use in game loop
-    Food food = Food();
-    Food food1 = Food();
-    Food food2 = Food();
-
-    Snake snake = Snake();
+    Game game = Game();
     
 
     // Main game loop, if user presses escape or x then ends game loop.
     while(WindowShouldClose()==false){
         BeginDrawing();
         if(eventTriggered(0.2)){
-            snake.Update();
+            game.Update();
         }
 
-        if(IsKeyPressed(KEY_UP) && snake.direction.y!=1){
-            snake.direction = {0,-1};
+        if(IsKeyPressed(KEY_UP) && game.snake.direction.y!=1){
+            game.snake.direction = {0,-1};
 
         }
-        if(IsKeyPressed(KEY_DOWN) && snake.direction.y!= -1){
-            snake.direction = {0,1};
+        if(IsKeyPressed(KEY_DOWN) && game.snake.direction.y!= -1){
+            game.snake.direction = {0,1};
 
         }
-        if(IsKeyPressed(KEY_LEFT) && snake.direction.x!=1){
-            snake.direction = {-1,0};
+        if(IsKeyPressed(KEY_LEFT) && game.snake.direction.x!=1){
+            game.snake.direction = {-1,0};
 
         }
-        if(IsKeyPressed(KEY_RIGHT) && snake.direction.x!=-1){
-            snake.direction = {1,0};
+        if(IsKeyPressed(KEY_RIGHT) && game.snake.direction.x!=-1){
+            game.snake.direction = {1,0};
 
         }
 
         //drawing the background
         ClearBackground(purple);
-        food.Draw();
-        food1.Draw();
-        food2.Draw();
-        snake.Draw();
+        game.Draw();
 
         EndDrawing();
     }
